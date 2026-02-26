@@ -705,50 +705,188 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Help Overlay Logic
-    const helpOverlay = document.getElementById('help-overlay');
-    const closeHelpBtn = document.getElementById('close-help-btn');
-    const helpStartBtn = document.getElementById('help-start-btn');
-    const showHelpBtn = document.getElementById('show-help-btn');
-    const helpHideToday = document.getElementById('help-hide-today');
+    // --- Guide Quest (Onboarding) System ---
+    const guideSteps = [
+        {
+            title: "은퇴 가능 자산",
+            message: "현재 자산과 은퇴 목표를 한눈에 확인하세요. Plan B와 비교하며 더 입체적인 설계가 가능합니다.",
+            selector: ".dashboard-card",
+            position: "bottom"
+        },
+        {
+            title: "계산 모드 선택",
+            message: "'언제 은퇴할 수 있을지' 또는 '얼마를 저축해야 할지' 목적에 맞는 모드를 선택하세요.",
+            selector: ".target-mode-toggle",
+            position: "bottom"
+        },
+        {
+            title: "상세 자산 설정",
+            message: "주식, 채권 등 자산별 수익률을 정교하게 설정하거나 국민연금 수령액을 반영할 수 있습니다.",
+            selector: ".settings-group:nth-of-type(2)",
+            position: "top"
+        },
+        {
+            title: "생애 이벤트",
+            message: "결혼, 주택 구입 등 미래의 큰 지출이나 수입을 타임라인에 추가해 보세요.",
+            selector: "#add-life-event-btn",
+            position: "bottom"
+        },
+        {
+            title: "추가 도구",
+            message: "자산 성장 그래프, 몬테카를로 시뮬레이션, 프로필 저장 등 강력한 부가 기능을 활용하세요.",
+            selector: ".speed-dial",
+            position: "top"
+        }
+    ];
 
-    const closeHelp = () => {
-        if (helpOverlay) {
-            if (helpHideToday && helpHideToday.checked) {
-                const tomorrow = new Date().getTime() + 24 * 60 * 60 * 1000;
-                localStorage.setItem('fire-help-closed-until', tomorrow.toString());
+    class GuideController {
+        constructor(steps) {
+            this.steps = steps;
+            this.currentStep = 0;
+            this.overlay = document.getElementById('guide-quest');
+            this.spotlight = document.getElementById('guide-spotlight');
+            this.dialog = document.getElementById('guide-dialog');
+            this.titleEl = document.getElementById('guide-title');
+            this.messageEl = document.getElementById('guide-message');
+            this.currentStepEl = document.getElementById('guide-step-current');
+            this.totalStepEl = document.getElementById('guide-step-total');
+            this.prevBtn = document.getElementById('guide-prev-btn');
+            this.nextBtn = document.getElementById('guide-next-btn');
+            this.hideTodayCb = document.getElementById('guide-hide-today');
+            this.closeBtn = document.getElementById('close-guide-btn');
+            this.showBtn = document.getElementById('show-help-btn');
+
+            this.init();
+        }
+
+        init() {
+            if (this.nextBtn) this.nextBtn.addEventListener('click', () => this.next());
+            if (this.prevBtn) this.prevBtn.addEventListener('click', () => this.prev());
+            if (this.closeBtn) this.closeBtn.addEventListener('click', () => this.stop());
+            if (this.showBtn) this.showBtn.addEventListener('click', () => this.start());
+
+            window.addEventListener('resize', () => {
+                if (this.overlay && this.overlay.style.display !== 'none') {
+                    this.updateUI();
+                }
+            });
+
+            this.checkAutoStart();
+        }
+
+        checkAutoStart() {
+            try {
+                const closedUntil = localStorage.getItem('fire-guide-closed-until');
+                const now = new Date().getTime();
+                if (!closedUntil || now > parseInt(closedUntil, 10)) {
+                    this.start();
+                }
+            } catch (e) {
+                this.start();
             }
-            helpOverlay.style.opacity = '0';
-            setTimeout(() => { helpOverlay.style.display = 'none'; }, 300);
         }
-    };
 
-    const showHelp = () => {
-        if (helpOverlay) {
-            helpOverlay.style.opacity = '0';
-            helpOverlay.style.display = 'flex';
-            // Force reflow
-            void helpOverlay.offsetWidth;
-            helpOverlay.style.opacity = '1';
+        start() {
+            this.currentStep = 0;
+            if (this.overlay) {
+                this.overlay.style.display = 'block';
+                // Force reflow
+                void this.overlay.offsetWidth;
+                this.overlay.style.opacity = '1';
+                this.updateUI();
+            }
         }
-    };
 
-    if (closeHelpBtn) closeHelpBtn.addEventListener('click', closeHelp);
-    if (helpStartBtn) helpStartBtn.addEventListener('click', closeHelp);
-    if (showHelpBtn) showHelpBtn.addEventListener('click', showHelp);
-
-    // Initial check for help visibility
-    try {
-        const closedUntil = localStorage.getItem('fire-help-closed-until');
-        const now = new Date().getTime();
-        // 무조건 표기하되, "하루 보지 않기"를 눌러 closedUntil이 미래면 무시
-        if (!closedUntil || now > parseInt(closedUntil, 10)) {
-            showHelp();
+        stop() {
+            if (this.hideTodayCb && this.hideTodayCb.checked) {
+                const tomorrow = new Date().getTime() + 24 * 60 * 60 * 1000;
+                localStorage.setItem('fire-guide-closed-until', tomorrow.toString());
+            }
+            if (this.overlay) {
+                this.overlay.style.opacity = '0';
+                setTimeout(() => {
+                    this.overlay.style.display = 'none';
+                }, 300);
+            }
         }
-    } catch (e) {
-        console.warn('localStorage is not available:', e);
-        showHelp();
+
+        next() {
+            if (this.currentStep < this.steps.length - 1) {
+                this.currentStep++;
+                this.updateUI();
+            } else {
+                this.stop();
+            }
+        }
+
+        prev() {
+            if (this.currentStep > 0) {
+                this.currentStep--;
+                this.updateUI();
+            }
+        }
+
+        updateUI() {
+            const step = this.steps[this.currentStep];
+            const target = document.querySelector(step.selector);
+
+            if (!target) {
+                this.next(); // Skip if target not found
+                return;
+            }
+
+            // Update Progress
+            if (this.currentStepEl) this.currentStepEl.textContent = this.currentStep + 1;
+            if (this.totalStepEl) this.totalStepEl.textContent = this.steps.length;
+
+            // Update Content
+            if (this.titleEl) this.titleEl.textContent = step.title;
+            if (this.messageEl) this.messageEl.textContent = step.message;
+
+            // Update Buttons
+            if (this.prevBtn) this.prevBtn.style.display = this.currentStep === 0 ? 'none' : 'block';
+            if (this.nextBtn) this.nextBtn.textContent = this.currentStep === this.steps.length - 1 ? '완료' : '다음';
+
+            // Targeted Element Scrolling
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // Update Spotlight & Dialog Position
+            setTimeout(() => {
+                const rect = target.getBoundingClientRect();
+
+                // Spotlight expansion
+                const padding = 10;
+                this.spotlight.style.top = `${rect.top - padding}px`;
+                this.spotlight.style.left = `${rect.left - padding}px`;
+                this.spotlight.style.width = `${rect.width + (padding * 2)}px`;
+                this.spotlight.style.height = `${rect.height + (padding * 2)}px`;
+
+                // Dialog positioning
+                const dialogRect = this.dialog.getBoundingClientRect();
+                const margin = 20;
+
+                let top, left;
+
+                if (step.position === 'bottom') {
+                    top = rect.bottom + margin;
+                    left = rect.left + (rect.width / 2) - (dialogRect.width / 2);
+                } else {
+                    top = rect.top - dialogRect.height - margin;
+                    left = rect.left + (rect.width / 2) - (dialogRect.width / 2);
+                }
+
+                // Bounds checking
+                left = Math.max(margin, Math.min(left, window.innerWidth - dialogRect.width - margin));
+                top = Math.max(margin, Math.min(top, window.innerHeight - dialogRect.height - margin));
+
+                this.dialog.style.top = `${top}px`;
+                this.dialog.style.left = `${left}px`;
+            }, 100);
+        }
     }
+
+    // Initialize Guide
+    const fireGuide = new GuideController(guideSteps);
 
     // Utility: Format numbers to '억 만원' or comma format
     const formatCurrency = (amountInTenK) => {

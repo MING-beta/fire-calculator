@@ -17,34 +17,33 @@
 
 <body class="dark-theme">
     <div class="app-container">
-        <!-- Help Overlay Popup -->
-        <div id="help-overlay" class="help-overlay" style="display: none;">
-            <div class="help-content glassmorphism">
-                <div class="help-header">
-                    <h2>💡 사용 길라잡이</h2>
-                    <button class="close-help-btn" id="close-help-btn">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
+        <!-- Guide Quest Overlay -->
+        <div id="guide-quest" class="guide-quest-overlay" style="display: none;">
+            <div id="guide-spotlight" class="guide-spotlight"></div>
+            <div id="guide-dialog" class="guide-dialog glassmorphism">
+                <div class="guide-content">
+                    <div class="guide-header">
+                        <span class="guide-badge">QUEST</span>
+                        <h2 id="guide-title">기능 안내</h2>
+                        <button class="close-guide-btn" id="close-guide-btn">&times;</button>
+                    </div>
+                    <div class="guide-body">
+                        <p id="guide-message">설명 내용이 여기에 표시됩니다.</p>
+                    </div>
+                    <div class="guide-footer">
+                        <div class="guide-progress">
+                            <span id="guide-step-current">1</span> / <span id="guide-step-total">5</span>
+                        </div>
+                        <div class="guide-actions">
+                            <div style="display: flex; align-items: center; gap: 6px; margin-right: auto;">
+                                <input type="checkbox" id="guide-hide-today" class="guide-checkbox">
+                                <label for="guide-hide-today" class="guide-checkbox-label">오늘 하루 보지 않기</label>
+                            </div>
+                            <button id="guide-prev-btn" class="guide-nav-btn prev" style="display: none;">이전</button>
+                            <button id="guide-next-btn" class="guide-nav-btn next">다음</button>
+                        </div>
+                    </div>
                 </div>
-                <div class="help-body">
-                    <p>• <b>📌 계산 모드:</b> '예상 은퇴 나이' 또는 '필요 월 저축액' 등 내가 원하는 기준에 맞춰 결과를 산출해 줍니다.</p>
-                    <p>• <b>📊 자산 상세 및 연금:</b> 주식/채권 등 자산군별 기대 수익률을 쪼개서 설정하고 향후 수령할 노령연금도 반영할 수 있습니다.</p>
-                    <p>• <b>⚖️ Plan B 및 스트레스:</b> 상단 토글을 켜서 두 가지 시나리오를 동시에 비교해 보거나, 버튼 한 번으로 고물가 상황을 테스트해 보세요.</p>
-                    <p>• <b>�️ 생애 이벤트:</b> 결혼, 전세금 등 미래에 목돈이 필요한 타이밍과 금액을 추가하여 타임라인에 반영하세요.</p>
-                    <p>• <b>⚙️ 프로필 및 부가기능:</b> 하단 메뉴를 통해 나만의 프로필을 무한으로 저장하거나, 자산 성장 궤적 그래프와 성공 확률(몬테카를로) 추이를 확인하세요.</p>
-                </div>
-                <div style="display: flex; align-items: center; gap: 6px; margin-top: 8px;">
-                    <input type="checkbox" id="help-hide-today"
-                        style="width:16px; height:16px; accent-color:var(--text-accent); cursor:pointer;">
-                    <label for="help-hide-today"
-                        style="font-size: 13px; color: var(--text-secondary); cursor: pointer; user-select: none;">오늘 하루
-                        보지 않기</label>
-                </div>
-                <button class="help-start-btn" id="help-start-btn">시작하기</button>
             </div>
         </div>
 

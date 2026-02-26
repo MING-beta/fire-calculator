@@ -1267,3 +1267,161 @@ input#compare-mode-toggle:checked+.slider::before {
 .fade-in-up {
     animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* --- Guide Quest Styles --- */
+.guide-quest-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.guide-spotlight {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7);
+    border-radius: 12px;
+    z-index: 10001;
+    pointer-events: none;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.guide-dialog {
+    position: fixed;
+    z-index: 10002;
+    width: 340px;
+    max-width: 90vw;
+    pointer-events: auto;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateY(0);
+}
+
+.guide-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.guide-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.guide-badge {
+    background: var(--text-accent);
+    color: #000;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.guide-header h2 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+    flex: 1;
+}
+
+.close-guide-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 24px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+}
+
+.guide-body p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.guide-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-top: 8px;
+}
+
+.guide-progress {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.guide-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.guide-checkbox {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--text-accent);
+    cursor: pointer;
+}
+
+.guide-checkbox-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    user-select: none;
+}
+
+.guide-nav-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid var(--border-glass);
+}
+
+.guide-nav-btn.prev {
+    background: transparent;
+    color: var(--text-primary);
+}
+
+.guide-nav-btn.next {
+    background: var(--accent-gradient);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+}
+
+.guide-nav-btn:active {
+    transform: scale(0.95);
+}
+
+/* Tooltip Arrow */
+.guide-dialog::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: var(--bg-card);
+    transform: rotate(45deg);
+    z-index: -1;
+    border: 1px solid var(--border-glass);
+    display: none;
+    /* Dynamic positioning logic will handle arrow if needed, but keeping it simple for now */
+}
+
+@media (max-width: 480px) {
+    .guide-dialog {
+        width: 300px;
+    }
+}
