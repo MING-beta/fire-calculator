@@ -779,9 +779,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             window.addEventListener('resize', () => {
                 if (this.overlay && this.overlay.style.display !== 'none') {
-                    this.updateUI();
+                    if (this.positionUpdateFn) this.positionUpdateFn();
                 }
             });
+
+            window.addEventListener('scroll', () => {
+                if (this.overlay && this.overlay.style.display !== 'none') {
+                    if (this.positionUpdateFn) this.positionUpdateFn();
+                }
+            }, { passive: true });
 
             this.checkAutoStart();
         }
@@ -802,9 +808,8 @@ document.addEventListener('DOMContentLoaded', () => {
         start() {
             this.currentStep = 0;
             if (this.overlay) {
-                // 스크롤 방지 및 최상단 이동
-                document.body.style.overflow = 'hidden';
-                window.scrollTo({ top: 0, behavior: 'instant' });
+                // 스크롤 허용 (인앱브라우저/특정 환경에서 overflow: hidden 시 scrollIntoView 버그 방지)
+                document.body.style.overflow = '';
 
                 this.overlay.style.display = 'block';
                 // Force reflow
@@ -871,6 +876,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Targeted Element Scrolling
             target.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
+            if (this.posInterval) clearInterval(this.posInterval);
+
             // Update Spotlight & Dialog Position
             const positionUpdate = () => {
                 const rect = target.getBoundingClientRect();
@@ -884,7 +891,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Dialog positioning
                 const dialogRect = this.dialog.getBoundingClientRect();
-                const margin = 25;
+                const margin = window.innerWidth < 480 ? 10 : 25;
 
                 let top, left;
                 left = rect.left + (rect.width / 2) - (dialogRect.width / 2);
@@ -911,7 +918,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.dialog.style.left = `${left}px`;
             };
 
-            setTimeout(positionUpdate, 500);
+            this.positionUpdateFn = positionUpdate;
+            positionUpdate();
+
+            // Continuously update position to handle smooth scrolling, dynamic viewports, and in-app browser quirks
+            let frameCount = 0;
+            this.posInterval = setInterval(() => {
+                positionUpdate();
+                frameCount++;
+                if (frameCount > 60) { // 약 1초 동안 스크롤 애니메이션 추적
+                    clearInterval(this.posInterval);
+                }
+            }, 16);
         }
     }
 
