@@ -50,10 +50,9 @@ jobs:
         if: env.has_changes == 'true'
         run: |
           git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Actions System"
-          git add README.md
+          # Add the modified README and the commit message file
+          git add README.md .github/scripts/commit_msg.txt
           
-          # Instead of amending (which requires force-pushing), we will update the commit 
-          git reset --soft HEAD~1
-          git commit -F .github/scripts/commit_msg.txt
-          git push --force origin HEAD:main
+          # Use the AI-generated summary as the commit message for the new commit
+          git commit -a -F .github/scripts/commit_msg.txt || echo "No changes to commit"
+          git push origin main
