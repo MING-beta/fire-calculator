@@ -51,9 +51,18 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Actions System"
+          
+          # Ensure commit_msg.txt exists to avoid git errors
+          touch .github/scripts/commit_msg.txt
+          
           # Add the modified README and the commit message file
-          git add README.md .github/scripts/commit_msg.txt
+          git add README.md .github/scripts/commit_msg.txt || true
           
           # Use the AI-generated summary as the commit message for the new commit
-          git commit -a -F .github/scripts/commit_msg.txt || echo "No changes to commit"
+          if [ -s .github/scripts/commit_msg.txt ]; then
+            git commit -a -F .github/scripts/commit_msg.txt || echo "No changes to commit"
+          else
+            git commit -m "DOPAMING 자동 문서 업데이트" || echo "No changes to commit"
+          fi
+          
           git push origin HEAD:main
