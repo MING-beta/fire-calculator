@@ -1676,6 +1676,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         updateProfileSelect();
+        trackEvent('app_initialized', 'System', 'v1.1.0');
     };
 
     // --- Analytics Tracking Utility ---

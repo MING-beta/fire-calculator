@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fire-tribe-v1';
+const CACHE_NAME = 'fire-tribe-v1.1.1';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -43,9 +43,14 @@ self.addEventListener('activate', (event) => {
 
 // Fetch Event
 self.addEventListener('fetch', (event) => {
+    // Skip non-GET requests and external URLs (like analytics)
+    if (event.request.method !== 'GET' || !event.request.url.startsWith(self.location.origin)) {
+        return;
+    }
+
     event.respondWith(
-        caches.match(event.request).then((response) => {
-            return response || fetch(event.request);
+        caches.match(event.request).then((cacheResponse) => {
+            return cacheResponse || fetch(event.request);
         })
     );
 });
