@@ -1,0 +1,26 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "extends": "eslint:recommended",
+    "parserOptions": {
+        "ecmaVersion": 12,
+        "sourceType": "script"
+    },
+    "rules": {
+        "no-unused-vars": "warn",
+        "no-undef": "warn",
+        "no-constant-condition": "warn",
+        "no-empty": "warn",
+        "semi": [
+            "warn",
+            "always"
+        ]
+    },
+    "globals": {
+        "Chart": "readonly",
+        "html2canvas": "readonly",
+        "saveAs": "readonly"
+    }
+}

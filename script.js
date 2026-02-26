@@ -1661,7 +1661,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     profiles['default'] = { name: '현재 편집 상태', state: parsed };
                     saveProfiles(profiles);
                     currentProfileId = 'default';
-                } catch (e) { }
+                } catch (e) {
+                    // Ignore legacy state parsing errors
+                }
             }
         } else {
             // Priority: Apply current profile's state if available
@@ -2563,7 +2565,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const isInAppBrowser = /kakao|instagram|line|everytime|naver/i.test(ua);
 
                 if (isInAppBrowser) {
-                    customAlert("인앱 브라우저(카카오/인스타 등)에서는 PDF 파일 저장이 원활하지 않습니다.<br><br>화면 우측 하단 또는 상단의 <b>'⠇(메뉴)'</b> 버튼을 눌러<br><b>'다른 브라우저(크롬/사파리)로 열기'</b>를 선택한 후 다시 시도해주세요.");
+                    showToast("인앱 브라우저(카카오/인스타 등)에서는 PDF 파일 저장이 원활하지 않습니다.<br><br>화면 우측 하단 또는 상단의 <b>'⠇(메뉴)'</b> 버튼을 눌러<br><b>'다른 브라우저(크롬/사파리)로 열기'</b>를 선택한 후 다시 시도해주세요.");
                     return;
                 }
 
