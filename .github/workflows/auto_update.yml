@@ -6,6 +6,7 @@ on:
       - main
     paths-ignore:
       - 'README.md'
+      - 'VERSION'
       - '.github/**'
 
 jobs:
@@ -55,8 +56,8 @@ jobs:
           # Ensure commit_msg.txt exists to avoid git errors
           touch .github/scripts/commit_msg.txt
           
-          # Add the modified README and the commit message file
-          git add README.md .github/scripts/commit_msg.txt || true
+          # Add the modified README, VERSION and the commit message file
+          git add README.md VERSION .github/scripts/commit_msg.txt || true
           
           # Use the AI-generated summary as the commit message for the new commit
           if [ -s .github/scripts/commit_msg.txt ]; then
