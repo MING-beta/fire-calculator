@@ -61,6 +61,19 @@
 ## 업데이트 내역
 <!-- UPDATE_LOG_START -->
 
+### v<<<<<<< Updated upstream
+1.0.9
+=======
+1.0.5
+>>>>>>> Stashed changes.1 (2026-02-26) 업데이트
+* Google Analytics (GA4) 연동을 활성화하고 추적 ID를 설정했습니다.
+* PWA(Progressive Web App) 매니페스트 파일을 다음과 같이 개선했습니다:
+    * 앱 고유 ID (`/fire-calculator/`)를 추가했습니다.
+    * 시작 URL을 `./index.html`로 명확히 지정했습니다.
+    * 앱 스코프(`./`)와 화면 방향(세로, `portrait`)을 정의했습니다.
+    * 앱 카테고리(금융, 라이프스타일)를 추가하여 앱 스토어 등에서 더 잘 검색되도록 했습니다.
+    * 다양한 PWA 환경을 지원하기 위해 아이콘 정의를 보강했습니다 (any 및 maskable 목적별 아이콘 추가).
+
 ### v1.0.9 (2026-02-26) 업데이트
 *   **PWA (Progressive Web App) 기능 도입**:
     *   `manifest.json` 파일 및 `sw.js` (Service Worker) 스크립트가 새로 추가되어 웹 앱 설치 기능을 제공합니다.
