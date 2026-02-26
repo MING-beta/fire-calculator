@@ -711,13 +711,21 @@ document.addEventListener('DOMContentLoaded', () => {
             title: "다크/라이트 모드",
             message: "해당 버튼을 눌러 낮과 밤 중 원하는 화면 테마로 언제든지 변경할 수 있습니다.",
             selector: "#theme-btn",
-            position: "bottom"
+            position: "bottom",
+            onStart: () => {
+                const modal = document.querySelector('.modal-overlay:not(.hidden)');
+                if (modal) modal.click(); // Close any open modals
+            }
         },
         {
             title: "은퇴 가능 자산",
             message: "현재 자산과 은퇴 목표를 한눈에 확인하세요. Plan B와 비교하며 더 입체적인 설계가 가능합니다.",
             selector: ".dashboard-card",
-            position: "bottom"
+            position: "bottom",
+            onStart: () => {
+                // Ensure Plan B is toggled OFF for base view instruction
+                if (compareModeToggle && compareModeToggle.checked) compareModeToggle.click();
+            }
         },
         {
             title: "결과 저장 및 공유",
@@ -728,14 +736,23 @@ document.addEventListener('DOMContentLoaded', () => {
         {
             title: "계산 모드 선택",
             message: "'언제 은퇴할 수 있을지' 또는 '얼마를 저축해야 할지' 목적에 맞는 모드를 선택하세요.",
-            selector: ".target-mode-toggle",
-            position: "bottom"
+            selector: "#calc-mode-age-btn", // More specific ID
+            position: "bottom",
+            onStart: () => {
+                // Return to base state
+                if (compareModeToggle && compareModeToggle.checked) compareModeToggle.click();
+            }
         },
         {
             title: "상세 자산 설정",
             message: "현재까지 모은 자산과 예상 수익률을 설정하세요. '자산군별 상세 설정'을 통해 주식, 채권 비중을 정교하게 관리할 수도 있습니다.",
-            selector: "#detailed-settings-group .section-title",
-            position: "bottom"
+            selector: "#detailed-settings-group", // Specific ID
+            position: "bottom",
+            onStart: () => {
+                // Ensure the section is visible
+                const group = document.getElementById('detailed-settings-group');
+                if (group) group.scrollIntoView({ behavior: 'instant', block: 'center' });
+            }
         },
         {
             title: "생애 이벤트",
@@ -747,7 +764,13 @@ document.addEventListener('DOMContentLoaded', () => {
             title: "추가 도구",
             message: "자산 성장 그래프, 몬테카를로 시뮬레이션, 프로필 저장 등 강력한 부가 기능을 활용하세요.",
             selector: ".speed-dial",
-            position: "top"
+            position: "top",
+            onStart: () => {
+                const sd = document.getElementById('speed-dial');
+                if (sd && !sd.classList.contains('active')) {
+                    document.getElementById('speed-dial-main-btn')?.click();
+                }
+            }
         }
     ];
 
@@ -853,83 +876,100 @@ document.addEventListener('DOMContentLoaded', () => {
 
         updateUI() {
             const step = this.steps[this.currentStep];
-            const target = document.querySelector(step.selector);
 
-            if (!target) {
-                console.warn(`Guide target not found: ${step.selector}`);
-                this.next();
-                return;
+            // Execute state-management hook if it exists
+            if (step.onStart) {
+                step.onStart();
             }
 
-            // Update Progress
-            if (this.currentStepEl) this.currentStepEl.textContent = this.currentStep + 1;
-            if (this.totalStepEl) this.totalStepEl.textContent = this.steps.length;
+            // Wait for DOM reflow after potential state changes from onStart
+            requestAnimationFrame(() => {
+                const target = document.querySelector(step.selector);
 
-            // Update Content
-            if (this.titleEl) this.titleEl.textContent = step.title;
-            if (this.messageEl) this.messageEl.textContent = step.message;
-
-            // Update Buttons
-            if (this.prevBtn) this.prevBtn.style.display = this.currentStep === 0 ? 'none' : 'block';
-            if (this.nextBtn) this.nextBtn.textContent = this.currentStep === this.steps.length - 1 ? '완료' : '다음';
-
-            // Targeted Element Scrolling
-            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-            if (this.posInterval) clearInterval(this.posInterval);
-
-            // Update Spotlight & Dialog Position
-            const positionUpdate = () => {
-                const rect = target.getBoundingClientRect();
-
-                // Spotlight expansion
-                const padding = 15;
-                this.spotlight.style.top = `${rect.top - padding}px`;
-                this.spotlight.style.left = `${rect.left - padding}px`;
-                this.spotlight.style.width = `${rect.width + (padding * 2)}px`;
-                this.spotlight.style.height = `${rect.height + (padding * 2)}px`;
-
-                // Dialog positioning
-                const dialogRect = this.dialog.getBoundingClientRect();
-                const margin = window.innerWidth < 480 ? 10 : 25;
-
-                let top, left;
-                left = rect.left + (rect.width / 2) - (dialogRect.width / 2);
-
-                if (step.position === 'bottom') {
-                    top = rect.bottom + margin;
-                } else {
-                    top = rect.top - dialogRect.height - margin;
+                if (!target) {
+                    console.warn(`Guide target not found: ${step.selector}`);
+                    this.next();
+                    return;
                 }
 
-                // Boundary & Overlap check
-                if (top + dialogRect.height > window.innerHeight - margin) {
-                    top = rect.top - dialogRect.height - margin;
-                }
-                if (top < margin) {
-                    top = rect.bottom + margin;
-                }
+                // Update Progress
+                if (this.currentStepEl) this.currentStepEl.textContent = this.currentStep + 1;
+                if (this.totalStepEl) this.totalStepEl.textContent = this.steps.length;
 
-                // Clamp to screen
-                left = Math.max(margin, Math.min(left, window.innerWidth - dialogRect.width - margin));
-                top = Math.max(margin, Math.min(top, window.innerHeight - dialogRect.height - margin));
+                // Update Content
+                if (this.titleEl) this.titleEl.textContent = step.title;
+                if (this.messageEl) this.messageEl.textContent = step.message;
 
-                this.dialog.style.top = `${top}px`;
-                this.dialog.style.left = `${left}px`;
-            };
+                // Update Buttons
+                if (this.prevBtn) this.prevBtn.style.display = this.currentStep === 0 ? 'none' : 'block';
+                if (this.nextBtn) this.nextBtn.textContent = this.currentStep === this.steps.length - 1 ? '완료' : '다음';
 
-            this.positionUpdateFn = positionUpdate;
-            positionUpdate();
+                // Targeted Element Scrolling
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-            // Continuously update position to handle smooth scrolling, dynamic viewports, and in-app browser quirks
-            let frameCount = 0;
-            this.posInterval = setInterval(() => {
-                positionUpdate();
-                frameCount++;
-                if (frameCount > 60) { // 약 1초 동안 스크롤 애니메이션 추적
-                    clearInterval(this.posInterval);
-                }
-            }, 16);
+                if (this.posInterval) clearInterval(this.posInterval);
+
+                // Update Spotlight & Dialog Position
+                this.positionUpdateFn = () => {
+                    // Check if target is hidden (e.g., in a closed section)
+                    if (target.offsetWidth === 0 || target.offsetHeight === 0) {
+                        this.spotlight.style.opacity = '0';
+                        this.dialog.style.opacity = '0';
+                        return;
+                    }
+                    this.spotlight.style.opacity = '1';
+                    this.dialog.style.opacity = '1';
+
+                    const rect = target.getBoundingClientRect();
+
+                    // Spotlight expansion
+                    const padding = 15;
+                    this.spotlight.style.top = `${rect.top - padding}px`;
+                    this.spotlight.style.left = `${rect.left - padding}px`;
+                    this.spotlight.style.width = `${rect.width + (padding * 2)}px`;
+                    this.spotlight.style.height = `${rect.height + (padding * 2)}px`;
+
+                    // Dialog positioning
+                    const dialogRect = this.dialog.getBoundingClientRect();
+                    const margin = window.innerWidth < 480 ? 10 : 25;
+
+                    let top, left;
+                    left = rect.left + (rect.width / 2) - (dialogRect.width / 2);
+
+                    if (step.position === 'bottom') {
+                        top = rect.bottom + margin;
+                    } else {
+                        top = rect.top - dialogRect.height - margin;
+                    }
+
+                    // Boundary & Overlap check
+                    if (top + dialogRect.height > window.innerHeight - margin) {
+                        top = rect.top - dialogRect.height - margin;
+                    }
+                    if (top < margin) {
+                        top = rect.bottom + margin;
+                    }
+
+                    // Clamp to screen
+                    left = Math.max(margin, Math.min(left, window.innerWidth - dialogRect.width - margin));
+                    top = Math.max(margin, Math.min(top, window.innerHeight - dialogRect.height - margin));
+
+                    this.dialog.style.top = `${top}px`;
+                    this.dialog.style.left = `${left}px`;
+                };
+
+                this.positionUpdateFn();
+
+                // Continuously update position to handle smooth scrolling and dynamic viewports
+                let frameCount = 0;
+                this.posInterval = setInterval(() => {
+                    this.positionUpdateFn();
+                    frameCount++;
+                    if (frameCount > 60) {
+                        clearInterval(this.posInterval);
+                    }
+                }, 16);
+            });
         }
     }
 
