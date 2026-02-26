@@ -54,5 +54,6 @@ jobs:
           git add README.md
           
           # Amend the previous commit to include README.md updates and replace the message
-          git commit --amend -F .github/scripts/commit_msg.txt || echo "No changes to commit"
-          git push --force-with-lease
+          git config --global core.editor "cat"
+          git commit --amend -F .github/scripts/commit_msg.txt
+          git push --force-with-lease origin HEAD:main
