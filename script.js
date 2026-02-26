@@ -1365,7 +1365,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const getProfiles = () => {
         try {
-            return JSON.parse(localStorage.getItem('fire-profiles')) || {};
+            const profiles = JSON.parse(localStorage.getItem('fire-profiles')) || {};
+
+            // 만약 프로필이 비어있거나 'default'만 있다면 기본 샘플 3개를 주입합니다.
+            const hasCustomProfiles = Object.keys(profiles).some(id => id !== 'default');
+
+            if (!hasCustomProfiles) {
+                const samples = {
+                    'sample_aggressive': {
+                        name: "🔥 공격적 투자자 (30대)",
+                        state: {
+                            calcMode: "age", currentAge: "30", monthlyExpense: "250", monthlySavings: "400", currentSavings: "5000",
+                            returnRate: "12.0", inflationRate: "2.5", lifeExpectancy: "90",
+                            useAssetAlloc: true, assetStockAmt: "4000", assetStockRet: "15.0", assetBondAmt: "500", assetBondRet: "4.0", assetRealAmt: "500"
+                        }
+                    },
+                    'sample_balanced': {
+                        name: "🛡️ 안정적 근로자 (35대)",
+                        state: {
+                            calcMode: "age", currentAge: "35", monthlyExpense: "300", monthlySavings: "300", currentSavings: "12000",
+                            returnRate: "7.0", inflationRate: "2.0", lifeExpectancy: "100",
+                            isCompareMode: true, monthlySavingsB: "500", returnRateB: "9.5"
+                        }
+                    },
+                    'sample_late': {
+                        name: "⌛ 늦깎이 파이어족 (45대)",
+                        state: {
+                            calcMode: "age", currentAge: "45", monthlyExpense: "400", monthlySavings: "750", currentSavings: "25000",
+                            returnRate: "8.5", inflationRate: "2.2", lifeExpectancy: "100",
+                            usePension: true, pensionAge: "65", pensionAmount: "180"
+                        }
+                    }
+                };
+                // 기존 데이터(default 등)와 합칩니다.
+                return { ...profiles, ...samples };
+            }
+
+            return profiles;
         } catch (e) {
             return {};
         }
