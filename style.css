@@ -1283,11 +1283,13 @@ input#compare-mode-toggle:checked+.slider::before {
     left: 0;
     width: 0;
     height: 0;
-    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.8);
+    border: 2px solid var(--text-accent);
     border-radius: 12px;
     z-index: 10001;
     pointer-events: none;
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.8), 0 0 20px var(--text-accent);
 }
 
 .guide-dialog {

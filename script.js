@@ -727,9 +727,9 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         {
             title: "상세 자산 설정",
-            message: "주식, 채격 등 자산별 수익률을 정교하게 설정하거나 국민연금 수령액을 반영할 수 있습니다.",
-            selector: ".settings-group:nth-of-type(2)",
-            position: "top"
+            message: "현재까지 모은 자산과 예상 수익률을 설정하세요. '자산군별 상세 설정'을 통해 주식, 채권 비중을 정교하게 관리할 수도 있습니다.",
+            selector: "#detailed-settings-group .section-title",
+            position: "bottom"
         },
         {
             title: "생애 이벤트",
@@ -866,11 +866,11 @@ document.addEventListener('DOMContentLoaded', () => {
             target.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
             // Update Spotlight & Dialog Position
-            setTimeout(() => {
+            const positionUpdate = () => {
                 const rect = target.getBoundingClientRect();
 
                 // Spotlight expansion
-                const padding = 10;
+                const padding = 15;
                 this.spotlight.style.top = `${rect.top - padding}px`;
                 this.spotlight.style.left = `${rect.left - padding}px`;
                 this.spotlight.style.width = `${rect.width + (padding * 2)}px`;
@@ -878,31 +878,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Dialog positioning
                 const dialogRect = this.dialog.getBoundingClientRect();
-                const margin = 20;
+                const margin = 25;
 
                 let top, left;
+                left = rect.left + (rect.width / 2) - (dialogRect.width / 2);
 
                 if (step.position === 'bottom') {
                     top = rect.bottom + margin;
-                    left = rect.left + (rect.width / 2) - (dialogRect.width / 2);
-                } else if (step.position === 'top') {
+                } else {
                     top = rect.top - dialogRect.height - margin;
-                    left = rect.left + (rect.width / 2) - (dialogRect.width / 2);
                 }
 
-                // 가로 범위를 벗어나지 않도록 보정
-                left = Math.max(margin, Math.min(left, window.innerWidth - dialogRect.width - margin));
-
-                // 세로 범위 보정 (화면 안에 들어오도록)
+                // Boundary & Overlap check
+                if (top + dialogRect.height > window.innerHeight - margin) {
+                    top = rect.top - dialogRect.height - margin;
+                }
                 if (top < margin) {
-                    top = rect.bottom + margin; // 위가 부족하면 아래로 지시
-                } else if (top + dialogRect.height > window.innerHeight - margin) {
-                    top = rect.top - dialogRect.height - margin; // 아래가 부족하면 위로 지시
+                    top = rect.bottom + margin;
                 }
+
+                // Clamp to screen
+                left = Math.max(margin, Math.min(left, window.innerWidth - dialogRect.width - margin));
+                top = Math.max(margin, Math.min(top, window.innerHeight - dialogRect.height - margin));
 
                 this.dialog.style.top = `${top}px`;
                 this.dialog.style.left = `${left}px`;
-            }, 300); // 넉넉한 딜레이로 스크롤 이동 완료 대기
+            };
+
+            setTimeout(positionUpdate, 500);
         }
     }
 
