@@ -53,7 +53,7 @@ jobs:
           git config --local user.name "GitHub Actions System"
           git add README.md
           
-          # Amend the previous commit to include README.md updates and replace the message
-          git config --global core.editor "cat"
-          git commit --amend -F .github/scripts/commit_msg.txt
-          git push --force-with-lease origin HEAD:main
+          # Instead of amending (which requires force-pushing), we will update the commit 
+          git reset --soft HEAD~1
+          git commit -F .github/scripts/commit_msg.txt
+          git push --force origin HEAD:main
