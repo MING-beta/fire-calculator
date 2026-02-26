@@ -1367,10 +1367,12 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const profiles = JSON.parse(localStorage.getItem('fire-profiles')) || {};
 
-            // 만약 프로필이 비어있거나 'default'만 있다면 기본 샘플 3개를 주입합니다.
-            const hasCustomProfiles = Object.keys(profiles).some(id => id !== 'default');
+            // 기존 사용자들의 캐시 데이터가 있더라도 샘플 3개가 무조건 한 번은 추가되도록 합니다.
+            // 버전 관리 플래그를 사용하여 딱 한 번만 강제 주입합니다.
+            const SAMPLES_VERSION = 'v1_force';
+            const initialized = localStorage.getItem('fire-samples-init-version');
 
-            if (!hasCustomProfiles) {
+            if (initialized !== SAMPLES_VERSION) {
                 const samples = {
                     'sample_aggressive': {
                         name: "🔥 공격적 투자자 (30대)",
@@ -1397,8 +1399,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
                 };
-                // 기존 데이터(default 등)와 합칩니다.
-                return { ...profiles, ...samples };
+
+                // 기존 사용자 데이터를 유지하면서 샘플들을 병합합니다.
+                const mergedProfiles = { ...profiles, ...samples };
+                saveProfiles(mergedProfiles); // 즉시 저장하여 다음 로드 시 중복 방지
+                localStorage.setItem('fire-samples-init-version', SAMPLES_VERSION);
+                return mergedProfiles;
             }
 
             return profiles;
