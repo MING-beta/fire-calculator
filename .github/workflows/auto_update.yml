@@ -53,7 +53,6 @@ jobs:
           git config --local user.name "GitHub Actions System"
           git add README.md
           
-          COMMIT_MSG=$(cat .github/scripts/commit_msg.txt || echo "Auto updated README by AI")
-          
-          git commit -m "[AI] $COMMIT_MSG" || echo "No changes to commit"
-          git push
+          # Amend the previous commit to include README.md updates and replace the message
+          git commit --amend -F .github/scripts/commit_msg.txt || echo "No changes to commit"
+          git push --force-with-lease

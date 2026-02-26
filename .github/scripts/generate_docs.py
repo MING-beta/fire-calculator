@@ -102,9 +102,9 @@ def main():
         print(f"Generated Commit Msg: {commit_msg}")
         update_readme(readme_update)
         
-        # 커밋 메시지를 파일로 저장하여 GitHub Actions 배시 셸에서 읽을 수 있게 합니다.
+        # 커밋 메시지와 상세 요약 내용을 모두 포함하여 커밋 내용(Contents)에 방영되도록 저장
         with open(".github/scripts/commit_msg.txt", "w", encoding="utf-8") as f:
-            f.write(commit_msg.split('\n')[0]) # 혹시 여러줄이면 첫줄만
+            f.write(f"{commit_msg.strip()}\n\n{readme_update.strip()}")
     else:
         print("Failed to generate content.")
 
