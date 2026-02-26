@@ -2,12 +2,14 @@
 chcp 65001 >nul
 cd /d "C:\Users\user\Desktop\dopaming\fire-calculator"
 
-:loop
-echo 작업 내역을 GitHub에 자동 업로드 합니다...
+echo 작업 내역을 GitHub에 업로드 합니다...
 git add .
-git commit -m "chore: 자동 저장 커밋 (Auto Save)"
-git push origin main
 
-echo 완료! 10분 뒤에 다시 실행됩니다.
-timeout /t 600 /nobreak
-goto loop
+if "%~1"=="" (
+    git commit -m "chore: 작업 내역 커밋 (Antigravity IDE)"
+) else (
+    git commit -m "%~1"
+)
+
+git push origin main
+echo 완료!
