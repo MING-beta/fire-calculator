@@ -708,6 +708,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Guide Quest (Onboarding) System ---
     const guideSteps = [
         {
+            title: "다크/라이트 모드",
+            message: "해당 버튼을 눌러 낮과 밤 중 원하는 화면 테마로 언제든지 변경할 수 있습니다.",
+            selector: "#theme-btn",
+            position: "bottom"
+        },
+        {
             title: "은퇴 가능 자산",
             message: "현재 자산과 은퇴 목표를 한눈에 확인하세요. Plan B와 비교하며 더 입체적인 설계가 가능합니다.",
             selector: ".dashboard-card",
@@ -721,7 +727,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         {
             title: "상세 자산 설정",
-            message: "주식, 채권 등 자산별 수익률을 정교하게 설정하거나 국민연금 수령액을 반영할 수 있습니다.",
+            message: "주식, 채격 등 자산별 수익률을 정교하게 설정하거나 국민연금 수령액을 반영할 수 있습니다.",
             selector: ".settings-group:nth-of-type(2)",
             position: "top"
         },
@@ -779,16 +785,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 const closedUntil = localStorage.getItem('fire-guide-closed-until');
                 const now = new Date().getTime();
                 if (!closedUntil || now > parseInt(closedUntil, 10)) {
-                    this.start();
+                    // 캐시 오류 방지를 위해 시작 시점을 명확히 지연 실행
+                    setTimeout(() => this.start(), 500);
                 }
             } catch (e) {
-                this.start();
+                setTimeout(() => this.start(), 500);
             }
         }
 
         start() {
             this.currentStep = 0;
             if (this.overlay) {
+                // 스크롤 방지 및 최상단 이동
+                document.body.style.overflow = 'hidden';
+                window.scrollTo({ top: 0, behavior: 'instant' });
+
                 this.overlay.style.display = 'block';
                 // Force reflow
                 void this.overlay.offsetWidth;
@@ -798,6 +809,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         stop() {
+            // 스크롤 허용
+            document.body.style.overflow = '';
+
             if (this.hideTodayCb && this.hideTodayCb.checked) {
                 const tomorrow = new Date().getTime() + 24 * 60 * 60 * 1000;
                 localStorage.setItem('fire-guide-closed-until', tomorrow.toString());
@@ -831,7 +845,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const target = document.querySelector(step.selector);
 
             if (!target) {
-                this.next(); // Skip if target not found
+                console.warn(`Guide target not found: ${step.selector}`);
+                this.next();
                 return;
             }
 
@@ -870,18 +885,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (step.position === 'bottom') {
                     top = rect.bottom + margin;
                     left = rect.left + (rect.width / 2) - (dialogRect.width / 2);
-                } else {
+                } else if (step.position === 'top') {
                     top = rect.top - dialogRect.height - margin;
                     left = rect.left + (rect.width / 2) - (dialogRect.width / 2);
                 }
 
-                // Bounds checking
+                // 가로 범위를 벗어나지 않도록 보정
                 left = Math.max(margin, Math.min(left, window.innerWidth - dialogRect.width - margin));
-                top = Math.max(margin, Math.min(top, window.innerHeight - dialogRect.height - margin));
+
+                // 세로 범위 보정 (화면 안에 들어오도록)
+                if (top < margin) {
+                    top = rect.bottom + margin; // 위가 부족하면 아래로 지시
+                } else if (top + dialogRect.height > window.innerHeight - margin) {
+                    top = rect.top - dialogRect.height - margin; // 아래가 부족하면 위로 지시
+                }
 
                 this.dialog.style.top = `${top}px`;
                 this.dialog.style.left = `${left}px`;
-            }, 100);
+            }, 300); // 넉넉한 딜레이로 스크롤 이동 완료 대기
         }
     }
 
