@@ -1,17 +1,36 @@
 {
+    "id": "/fire-calculator/",
     "name": "FIRE Tribe",
     "short_name": "FIRE Tribe",
     "description": "Premium FIRE Calculator for smart financial planning",
-    "start_url": ".",
+    "start_url": "./index.html",
+    "scope": "./",
     "display": "standalone",
+    "orientation": "portrait",
     "background_color": "#0a0d14",
     "theme_color": "#38bdf8",
+    "categories": [
+        "finance",
+        "lifestyle"
+    ],
     "icons": [
+        {
+            "src": "icon-512.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
         {
             "src": "icon-512.png",
             "sizes": "512x512",
             "type": "image/png",
-            "purpose": "any maskable"
+            "purpose": "any"
+        },
+        {
+            "src": "icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
         }
     ]
 }
