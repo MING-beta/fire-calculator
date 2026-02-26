@@ -56,4 +56,4 @@ jobs:
           
           # Use the AI-generated summary as the commit message for the new commit
           git commit -a -F .github/scripts/commit_msg.txt || echo "No changes to commit"
-          git push
+          git push origin HEAD:main
