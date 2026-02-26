@@ -18,7 +18,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 2
           
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -56,4 +56,4 @@ jobs:
           
           # Use the AI-generated summary as the commit message for the new commit
           git commit -a -F .github/scripts/commit_msg.txt || echo "No changes to commit"
-          git push origin main
+          git push
