@@ -6,7 +6,7 @@ echo 작업 내역을 GitHub에 업로드 합니다...
 git add .
 
 if "%~1"=="" (
-    git commit -m "chore: 작업 내역 임시 커밋 (GitHub Action에서 AI 요약 진행)"
+    git commit -m "DOPAMING 작업 내역 임시 커밋 (GitHub Action에서 AI 요약 진행)"
 ) else (
     git commit -m "%~1"
 )
