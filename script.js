@@ -720,6 +720,12 @@ document.addEventListener('DOMContentLoaded', () => {
             position: "bottom"
         },
         {
+            title: "결과 저장 및 공유",
+            message: "설계한 은퇴 시뮬레이션 결과를 PDF 파일로 저장하거나 이미지로 캡처하여 보관할 수 있습니다.",
+            selector: ".header-actions",
+            position: "bottom"
+        },
+        {
             title: "계산 모드 선택",
             message: "'언제 은퇴할 수 있을지' 또는 '얼마를 저축해야 할지' 목적에 맞는 모드를 선택하세요.",
             selector: ".target-mode-toggle",
