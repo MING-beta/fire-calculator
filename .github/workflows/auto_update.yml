@@ -1,0 +1,59 @@
+name: Auto Commit Message and README Update
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'README.md'
+      - '.github/**'
+
+jobs:
+  auto-update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install google-genai requests
+          
+      - name: Check for Code Changes
+        id: check_changes
+        run: |
+          git diff --name-only HEAD^ HEAD > changed_files.txt
+          if [ -s changed_files.txt ]; then
+            echo "has_changes=true" >> $GITHUB_ENV
+          else
+            echo "has_changes=false" >> $GITHUB_ENV
+          fi
+          
+      - name: Generate AI Content and Update
+        if: env.has_changes == 'true'
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python .github/scripts/generate_docs.py
+        
+      - name: Commit and Push Changes
+        if: env.has_changes == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Actions System"
+          git add README.md
+          
+          COMMIT_MSG=$(cat .github/scripts/commit_msg.txt || echo "Auto updated README by AI")
+          
+          git commit -m "[AI] $COMMIT_MSG" || echo "No changes to commit"
+          git push
