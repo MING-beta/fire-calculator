@@ -50,6 +50,7 @@ jobs:
         if: env.has_changes == 'true'
         run: |
           git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Actions System"
           # Add the modified README and the commit message file
           git add README.md .github/scripts/commit_msg.txt
           
