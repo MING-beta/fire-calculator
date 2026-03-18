@@ -2715,15 +2715,40 @@ document.addEventListener('DOMContentLoaded', () => {
             const encodedStr = btoa(encodeURIComponent(jsonStr));
             const shareUrl = window.location.origin + window.location.pathname + '?data=' + encodedStr;
 
-            navigator.clipboard.writeText(shareUrl).then(() => {
-                showToast('고유 링크가 클립보드에 복사되었습니다!');
-                if (typeof window.trackEvent === 'function') {
-                    window.trackEvent('share', 'link_copied', 'dashboard_link');
+            const fallbackCopyTextToClipboard = (text) => {
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                textArea.style.position = "fixed";
+                textArea.style.top = "-9999px";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showToast('고유 링크가 클립보드에 복사되었습니다!');
+                    if (typeof window.trackEvent === 'function') {
+                        window.trackEvent('share', 'link_copied_fallback', 'dashboard_link');
+                    }
+                } catch (err) {
+                    console.error('Fallback copy failed', err);
+                    showToast('링크 복사에 실패했습니다.');
                 }
-            }).catch(err => {
-                console.error('Failed to copy link: ', err);
-                showToast('링크 복사에 실패했습니다.');
-            });
+                document.body.removeChild(textArea);
+            };
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(shareUrl).then(() => {
+                    showToast('고유 링크가 클립보드에 복사되었습니다!');
+                    if (typeof window.trackEvent === 'function') {
+                        window.trackEvent('share', 'link_copied', 'dashboard_link');
+                    }
+                }).catch(err => {
+                    console.warn('Clipboard API failed, using fallback.', err);
+                    fallbackCopyTextToClipboard(shareUrl);
+                });
+            } else {
+                fallbackCopyTextToClipboard(shareUrl);
+            }
         } catch (e) {
             console.error('State serialization failed', e);
             showToast('링크 생성 중 오류가 발생했습니다.');

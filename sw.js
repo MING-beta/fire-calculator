@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fire-tribe-v1.1.1';
+const CACHE_NAME = 'fire-tribe-v1.1.2';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -49,8 +49,16 @@ self.addEventListener('fetch', (event) => {
     }
 
     event.respondWith(
-        caches.match(event.request).then((cacheResponse) => {
-            return cacheResponse || fetch(event.request);
+        fetch(event.request).then((networkResponse) => {
+            // Update the cache with the new network response
+            const responseClone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+                cache.put(event.request, responseClone);
+            });
+            return networkResponse;
+        }).catch(() => {
+            // Fallback to cache if network fails (offline)
+            return caches.match(event.request);
         })
     );
 });
