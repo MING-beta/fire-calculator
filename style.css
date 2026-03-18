@@ -1428,6 +1428,7 @@ input#compare-mode-toggle:checked+.slider::before {
         width: 300px;
     }
 }
+
 /* Mobile UI Refinement */
 @media (max-width: 480px) {
     .guide-dialog {
@@ -1452,4 +1453,35 @@ input#compare-mode-toggle:checked+.slider::before {
     .guide-header h2 {
         font-size: 16px;
     }
+}
+
+/* Toast Message */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.toast {
+    background: var(--accent-gradient);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
 }

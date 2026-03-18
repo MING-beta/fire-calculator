@@ -269,6 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Switch between dark and light optionally persisting with localStorage
         const isLight = document.body.classList.contains('light-theme');
         localStorage.setItem('fire-theme', isLight ? 'light' : 'dark');
+        trackEvent('toggle_theme', 'Settings', isLight ? 'Light' : 'Dark');
 
         // Update Chart Colors if rendered
         if (fireChart) {
@@ -363,12 +364,6 @@ document.addEventListener('DOMContentLoaded', () => {
             { el: pensionAgeInput, val: pensionAgeVal }
         ];
 
-        if (usePensionToggle) {
-            usePensionToggle.addEventListener('change', (e) => {
-                if (pensionInputs) pensionInputs.style.display = e.target.checked ? 'flex' : 'none';
-                calculateFIRE();
-            });
-        }
         if (pensionAmountInput) {
             pensionAmountInput.addEventListener('input', (e) => {
                 let val = e.target.value.replace(/[^0-9]/g, '');
@@ -398,6 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (returnPlanA) returnPlanA.style.pointerEvents = isDetailed ? 'none' : 'auto';
                 if (isDetailed) computeDetailedAsset(false);
                 calculateFIRE();
+                trackEvent('toggle_asset_alloc', 'Settings', `Plan A: ${isDetailed ? 'Detailed' : 'Simple'}`);
             });
         }
 
@@ -830,6 +826,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         start() {
             this.currentStep = 0;
+            trackEvent('start_guide', 'Guide', 'Start');
             if (this.overlay) {
                 // 스크롤 허용 (인앱브라우저/특정 환경에서 overflow: hidden 시 scrollIntoView 버그 방지)
                 document.body.style.overflow = '';
@@ -843,6 +840,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         stop() {
+            trackEvent('stop_guide', 'Guide', `Step ${this.currentStep + 1}`);
             // 스크롤 허용
             document.body.style.overflow = '';
 
@@ -1677,15 +1675,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         updateProfileSelect();
         trackEvent('app_initialized', 'System', 'v1.1.0');
+
+        // Periodical heartbeat to keep session active and show "stacking" data in Realtime
+        setInterval(() => {
+            trackEvent('active_session_heartbeat', 'System', 'Heartbeat');
+        }, 60000); // Every 1 minute
     };
 
     // --- Analytics Tracking Utility ---
     const trackEvent = (action, category, label, value) => {
-        if (typeof gtag === 'function') {
-            window.gtag('event', action, {
+        const gtagFunc = window.gtag || window.parent?.gtag;
+        if (typeof gtagFunc === 'function') {
+            gtagFunc('event', action, {
                 'event_category': category,
                 'event_label': label,
-                'value': value
+                'value': value,
+                'send_to': 'G-YWC7FQQ34S'
             });
         }
         console.log(`[Analytics] ${category} > ${action}: ${label}`);
@@ -2611,8 +2616,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Export State to URL (Link Sharing)
+    const shareLinkBtn = document.getElementById('share-link-btn');
+    if (shareLinkBtn) {
+        shareLinkBtn.addEventListener('click', () => {
+            exportStateToURL();
+        });
+    }
+
     // Initialize
-    loadState();
+    const urlParams = new URLSearchParams(window.location.search);
+    const sharedData = urlParams.get('data');
+
+    if (sharedData) {
+        applyStateFromURL(sharedData);
+    } else {
+        loadState();
+    }
+
     attachSliderListeners();
 
     // Force sync the compareModeToggle with the browser's restored state if it wasn't triggered
@@ -2659,7 +2680,117 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { passive: true });
     }
 
-    // --- Speed Dial Logic ---
+    // --- Link Sharing (State Serialization) ---
+    function exportStateToURL() {
+        const state = {
+            calcMode,
+            targetMode,
+            isCompareMode,
+            useAssetAlloc: useAssetAllocToggle.checked,
+            useAssetAllocB: useAssetAllocToggleB.checked,
+            usePension: usePensionToggle.checked,
+            lifeEvents: lifeEvents,
+            inputs: {}
+        };
+
+        // Serialize all input values
+        const inputIds = [
+            'current-age', 'target-age', 'monthly-expense',
+            'pension-age', 'pension-amount',
+            'life-expectancy', 'swr-rate',
+            'monthly-savings', 'savings-growth', 'return-rate', 'current-savings',
+            'monthly-savings-b', 'savings-growth-b', 'return-rate-b', 'current-savings-b',
+            'inflation-rate', 'inflation-rate-b',
+            'asset-stock-amount', 'asset-stock-return', 'asset-bond-amount', 'asset-bond-return', 'asset-realestate-amount',
+            'asset-stock-amount-b', 'asset-stock-return-b', 'asset-bond-amount-b', 'asset-bond-return-b', 'asset-realestate-amount-b'
+        ];
+
+        inputIds.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) state.inputs[id] = el.value;
+        });
+
+        try {
+            const jsonStr = JSON.stringify(state);
+            const encodedStr = btoa(encodeURIComponent(jsonStr));
+            const shareUrl = window.location.origin + window.location.pathname + '?data=' + encodedStr;
+
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                showToast('고유 링크가 클립보드에 복사되었습니다!');
+                if (typeof window.trackEvent === 'function') {
+                    window.trackEvent('share', 'link_copied', 'dashboard_link');
+                }
+            }).catch(err => {
+                console.error('Failed to copy link: ', err);
+                showToast('링크 복사에 실패했습니다.');
+            });
+        } catch (e) {
+            console.error('State serialization failed', e);
+            showToast('링크 생성 중 오류가 발생했습니다.');
+        }
+    }
+
+    function applyStateFromURL(encodedStr) {
+        try {
+            const jsonStr = decodeURIComponent(atob(encodedStr));
+            const state = JSON.parse(jsonStr);
+
+            // Apply modes
+            if (state.calcMode === 'savings') {
+                calcModeAgeBtn.classList.remove('active');
+                calcModeSavingsBtn.classList.add('active');
+                calcMode = 'savings';
+            }
+
+            if (state.targetMode === 'swr') {
+                document.getElementById('mode-life-btn').classList.remove('active');
+                document.getElementById('mode-swr-btn').classList.add('active');
+                targetMode = 'swr';
+            }
+
+            // Apply toggles
+            if (state.isCompareMode && !compareModeToggle.checked) {
+                compareModeToggle.checked = true;
+            } else if (!state.isCompareMode && compareModeToggle.checked) {
+                compareModeToggle.checked = false;
+            }
+
+            useAssetAllocToggle.checked = !!state.useAssetAlloc;
+            useAssetAllocToggleB.checked = !!state.useAssetAllocB;
+            usePensionToggle.checked = !!state.usePension;
+
+            // Apply life events
+            if (state.lifeEvents && Array.isArray(state.lifeEvents)) {
+                lifeEvents = state.lifeEvents;
+                renderLifeEvents();
+            }
+
+            // Apply inputs
+            if (state.inputs) {
+                Object.keys(state.inputs).forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.value = state.inputs[id];
+                    }
+                });
+            }
+
+            // Trigger updates
+            compareModeToggle.dispatchEvent(new Event('change'));
+            usePensionToggle.dispatchEvent(new Event('change'));
+            useAssetAllocToggle.dispatchEvent(new Event('change'));
+            useAssetAllocToggleB.dispatchEvent(new Event('change'));
+
+            updateDualSliderUI();
+            calculateFIRE();
+            showToast('공유된 시나리오를 성공적으로 불러왔습니다!');
+        } catch (e) {
+            console.error('Failed to parse state from URL', e);
+            showToast('잘못된 형태의 공유 링크입니다.');
+        }
+    }
+
+
     const speedDial = document.getElementById('speed-dial');
     const speedDialMainBtn = document.getElementById('speed-dial-main-btn');
 
@@ -2684,5 +2815,4 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
-
 });

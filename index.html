@@ -42,6 +42,7 @@
 </head>
 
 <body class="dark-theme">
+    <div id="toast-container" class="toast-container"></div>
     <div class="app-container">
         <!-- Guide Quest Overlay -->
         <div id="guide-quest" class="guide-quest-overlay" style="display: none;">
@@ -130,6 +131,15 @@
                                     style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; transition: .4s; border-radius: 34px;"></span>
                             </label>
                         </div>
+                        <button id="share-link-btn" class="export-btn" aria-label="결과 링크로 공유하기" title="결과 링크로 공유하기">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="18" cy="5" r="3"></circle>
+                                <circle cx="6" cy="12" r="3"></circle>
+                                <circle cx="18" cy="19" r="3"></circle>
+                                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                            </svg>
+                        </button>
                         <button id="export-pdf-btn" class="export-btn" aria-label="전체 PDF 저장하기" title="전체 PDF 저장하기">
                             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
