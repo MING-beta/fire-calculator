@@ -1,0 +1,294 @@
+:root {
+            --bg-color: #0a0d14;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --app-hover: rgba(56, 189, 248, 0.1);
+            --app-glow: 0 0 20px rgba(56, 189, 248, 0.3);
+            --accent-color: #38bdf8;
+            --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+        }
+
+        /* Light Theme Optional Support if user device is light mode */
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg-color: #f8fafc;
+                --text-primary: #0f172a;
+                --text-secondary: #64748b;
+                --glass-bg: rgba(255, 255, 255, 0.7);
+                --glass-border: rgba(0, 0, 0, 0.08);
+                --app-hover: rgba(56, 189, 248, 0.05);
+                --app-glow: 0 8px 30px rgba(0, 0, 0, 0.05);
+                --accent-color: #0284c7;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Pretendard', 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Background Effects */
+        .bg-blob {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, rgba(129, 140, 248, 0) 70%);
+            top: -200px;
+            right: -200px;
+            z-index: 0;
+            filter: blur(80px);
+            animation: float 10s ease-in-out infinite alternate;
+        }
+
+        .bg-blob-2 {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.1) 0%, rgba(236, 72, 153, 0) 70%);
+            bottom: -150px;
+            left: -150px;
+            z-index: 0;
+            filter: blur(80px);
+            animation: float 12s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            100% {
+                transform: translate(-30px, 30px) scale(1.1);
+            }
+        }
+
+        /* Main Portal Container */
+        .portal-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 1000px;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .portal-header {
+            margin-bottom: 60px;
+            opacity: 0;
+            transform: translateY(-20px);
+            animation: fadeInDown 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .portal-logo {
+            font-size: 42px;
+            font-weight: 800;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+            margin-bottom: 12px;
+        }
+
+        .portal-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* App Grid */
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 24px;
+            max-width: 700px;
+            margin: 0 auto;
+            perspective: 1000px;
+        }
+
+        .app-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(12px);
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation-delay: 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.08) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 0;
+        }
+
+        .app-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            background: var(--app-hover);
+            border-color: rgba(56, 189, 248, 0.3);
+            box-shadow: var(--app-glow);
+        }
+
+        .app-card:hover::before {
+            opacity: 1;
+        }
+
+        .app-icon-wrapper {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.1) 0%, rgba(129, 140, 248, 0.1) 100%);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+            position: relative;
+            z-index: 1;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .app-card:hover .app-icon-wrapper {
+            transform: scale(1.1) translateY(-4px);
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.2) 0%, rgba(129, 140, 248, 0.2) 100%);
+        }
+
+        /* Specific App Icon Gradients */
+        .icon-fire {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(239, 68, 68, 0.15) 100%);
+            color: #f97316;
+        }
+
+        .app-card:hover .icon-fire {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.25) 0%, rgba(239, 68, 68, 0.25) 100%);
+            box-shadow: 0 0 20px rgba(249, 115, 22, 0.3);
+        }
+
+        .icon-plus {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-secondary);
+            border: 2px dashed var(--glass-border);
+        }
+
+        .app-card:hover .icon-plus {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+            border-style: solid;
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+
+        .app-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-align: center;
+            letter-spacing: -0.2px;
+            position: relative;
+            z-index: 1;
+            transition: color 0.3s ease;
+        }
+
+        .app-card:hover .app-name {
+            color: #fff;
+        }
+
+        .app-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-top: 6px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1;
+            position: relative;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .app-card:hover .app-desc {
+            opacity: 1;
+            transform: translateY(0);
+            height: auto;
+            margin-top: 8px;
+        }
+
+
+        /* Animations */
+        @keyframes fadeInDown {
+            0% {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .app-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+
+            .app-card {
+                padding: 20px 12px;
+            }
+
+            .portal-logo {
+                font-size: 32px;
+            }
+        }

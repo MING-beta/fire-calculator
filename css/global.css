@@ -1,0 +1,165 @@
+﻿/* style.css */
+:root {
+    /* Color Palette - Dark Mode Default */
+    --bg-base: #0a0d14;
+    --bg-card: rgba(22, 28, 45, 0.6);
+    --text-primary: #ffffff;
+    --text-secondary: #94a3b8;
+    --text-accent: #38bdf8;
+
+    --accent-gradient: linear-gradient(135deg, #38bdf8, #818cf8);
+    --border-glass: rgba(255, 255, 255, 0.08);
+    --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    --bg-input: rgba(15, 23, 42, 0.8);
+
+    --radius-lg: 24px;
+    --radius-md: 16px;
+    --radius-sm: 8px;
+
+    /* Light Mode Variables - optional fallback */
+    --bg-base-light: #f8fafc;
+    --bg-card-light: rgba(255, 255, 255, 0.8);
+    --text-primary-light: #0f172a;
+    --text-secondary-light: #64748b;
+    --border-glass-light: rgba(0, 0, 0, 0.05);
+
+    /* Plan B Specific Theme */
+    --plan-b-bg: rgba(168, 85, 247, 0.08);
+    /* Dark mode purple hue */
+    --plan-b-border: rgba(168, 85, 247, 0.15);
+    --plan-b-accent: #a855f7;
+    --plan-b-input-bg: rgba(0, 0, 0, 0.2);
+
+    /* Plan A Highlight Theme */
+    --plan-a-bg: rgba(56, 189, 248, 0.1);
+    /* Slightly more opaque blue hue */
+    --plan-a-border: rgba(56, 189, 248, 0.25);
+}
+
+.light-theme {
+    --bg-base: var(--bg-base-light);
+    --bg-card: var(--bg-card-light);
+    --text-primary: var(--text-primary-light);
+    --text-secondary: var(--text-secondary-light);
+    --border-glass: var(--border-glass-light);
+    --shadow-glass: 0 8px 32px 0 rgba(148, 163, 184, 0.15);
+    --bg-input: #ffffff;
+    --text-accent: #0ea5e9;
+    --accent-gradient: linear-gradient(135deg, #0284c7, #3b82f6);
+
+    /* Plan B Specific Theme */
+    --plan-b-bg: rgba(168, 85, 247, 0.05);
+    --plan-b-border: rgba(168, 85, 247, 0.25);
+    --plan-b-input-bg: rgba(255, 255, 255, 0.6);
+
+    /* Plan A Highlight Theme */
+    --plan-a-bg: rgba(2, 132, 199, 0.08);
+    /* Light mode blue hue */
+    --plan-a-border: rgba(2, 132, 199, 0.25);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    transition: background-color 0.4s ease, color 0.4s ease;
+    min-height: 100vh;
+    overflow-x: hidden;
+    /* Soft ambient background glow */
+    background-image:
+        radial-gradient(circle at 15% 50%, rgba(56, 189, 248, 0.08), transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(129, 140, 248, 0.08), transparent 25%);
+}
+
+.app-container {
+    max-width: 480px;
+    /* Mobile width */
+    margin: 0 auto;
+    padding: 24px 20px 100px;
+    /* Extra padding for FAB */
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+}
+
+/* Glassmorphism Card */
+.glassmorphism {
+    background: var(--bg-card);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-glass);
+    padding: 24px;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Toast Message */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.toast {
+    background: var(--accent-gradient);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}

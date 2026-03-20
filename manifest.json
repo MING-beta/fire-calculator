@@ -1,8 +1,8 @@
 {
     "id": "/fire-calculator/",
-    "name": "FIRE Tribe",
-    "short_name": "FIRE Tribe",
-    "description": "Premium FIRE Calculator for smart financial planning",
+    "name": "DOPAMING Portal",
+    "short_name": "DOPAMING",
+    "description": "Your centralized portal for productivity and smart financial planning",
     "start_url": "./index.html",
     "scope": "./",
     "display": "standalone",

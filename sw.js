@@ -1,8 +1,12 @@
-const CACHE_NAME = 'fire-tribe-v1.1.2';
+const CACHE_NAME = 'fire-tribe-v1.3.0';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
-    './style.css',
+    './fire.html',
+    './css/global.css',
+    './css/components.css',
+    './css/calculator.css',
+    './css/portal.css',
     './script.js',
     './manifest.json',
     './icon-512.png',
